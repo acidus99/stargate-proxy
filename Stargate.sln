@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 25.0.1704.2
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stargate", "Stargate.csproj", "{B674F95A-E202-44F5-A00D-DC5D7E1ED389}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HtmlToGmi", "..\HtmlToGmi\HtmlToGmi.csproj", "{1F78C652-AB48-4325-A977-013E6F54655F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B674F95A-E202-44F5-A00D-DC5D7E1ED389}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B674F95A-E202-44F5-A00D-DC5D7E1ED389}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B674F95A-E202-44F5-A00D-DC5D7E1ED389}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B674F95A-E202-44F5-A00D-DC5D7E1ED389}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F78C652-AB48-4325-A977-013E6F54655F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F78C652-AB48-4325-A977-013E6F54655F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F78C652-AB48-4325-A977-013E6F54655F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F78C652-AB48-4325-A977-013E6F54655F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {09B44D6A-1620-4BF6-AEEA-9E16EDD100BB}
+	EndGlobalSection
+EndGlobal
