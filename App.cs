@@ -166,9 +166,35 @@ namespace Stargate
                 ShouldRenderHyperlinks = true
             };
             var content = converter.Convert(request.Url.AbsoluteUri, html);
-
             response.Success();
             response.Write(content.Gemtext);
+            WriteFooter(response, html.Length, content.Gemtext.Length);
+        }
+
+        private void WriteFooter(Response response, int htmlSize, int gmiSize)
+        {
+            response.WriteLine();
+            response.WriteLine();
+            response.WriteLine("------");
+            response.WriteLine("Teleported and converted via Stargate 💫🚪");
+            response.WriteLine($"Size: {ReadableFileSize(gmiSize)}. {Savings(gmiSize, htmlSize)} smaller than original: {ReadableFileSize(htmlSize)} 🤮");
+            response.WriteLine("=> mailto:acidus@gemi.dev Made with ❤️ by Acidus");
+        }
+
+        private string Savings(int newSize, int originalSize)
+            => string.Format("{0:0.00}%", (1.0d - (Convert.ToDouble(newSize) / Convert.ToDouble(originalSize))) * 100.0d);
+
+        private string ReadableFileSize(double size, int unit = 0)
+        {
+            string[] units = { "B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
+
+            while (size >= 1024)
+            {
+                size /= 1024;
+                ++unit;
+            }
+
+            return string.Format("{0:0.0#} {1}", size, units[unit]);
         }
 
 
