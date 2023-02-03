@@ -43,7 +43,7 @@ namespace Stargate.Requestors.Http
                     {
                         StatusCode = 20,
                         //TODO: handle charset, language
-                        Meta = http.Content.Headers.ContentType?.MediaType ?? ""
+                        Meta = http.Content.Headers.ContentType?.MediaType ?? "application/octet-stream"
                     };
                     break;
 
