@@ -6,7 +6,8 @@ namespace Stargate.Transformers
 		ITransformer[] transformers =
 		{
 			new HtmlTransformer(),
-			new RssTransformer()
+			new RssTransformer(),
+			new ImageTransformer()
 		};
 
 		public SourceResponse Transform(Request request, SourceResponse original)
