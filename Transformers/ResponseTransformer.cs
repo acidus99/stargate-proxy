@@ -6,6 +6,7 @@ namespace Stargate.Transformers
 		ITransformer[] transformers =
 		{
 			new HtmlTransformer(),
+			new RssTransformer()
 		};
 
 		public SourceResponse Transform(Request request, SourceResponse original)
@@ -18,8 +19,6 @@ namespace Stargate.Transformers
 				}
 			}
 			return original;
-		}
-		
+		}		
 	}
 }
-

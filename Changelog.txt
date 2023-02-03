@@ -1,2 +1,3 @@
 ﻿- Feature: Support non-HTML responses
 - Feature: Map HTTP response codes to Gemini (redirects, 404s, etc)
+- Feature: Convert RSS into Gemtext (like NewsWaffle)
