@@ -7,12 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Net\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Net\" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\HtmlToGmi\HtmlToGmi.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Transformers\" />
+    <None Remove="CodeHollow.FeedReader" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Transformers\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CodeHollow.FeedReader" Version="1.2.4" />
   </ItemGroup>
 </Project>

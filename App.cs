@@ -10,8 +10,9 @@ using System.Security.Authentication;
 using System.IO;
 using System.Threading.Tasks;
 
-using Stargate.Net;
+using Stargate.Requestors;
 using HtmlToGmi;
+
 
 namespace Stargate
 {
@@ -31,6 +32,8 @@ namespace Stargate
         private string hostname;
         private int port;
 
+        private Proxy proxy;
+
         public App(string hostname, int port, X509Certificate2 certificate)
         {
             this.hostname = hostname;
@@ -38,6 +41,7 @@ namespace Stargate
             listener = TcpListener.Create(port);
 
             serverCertificate = certificate;
+            proxy = new Proxy();
         }
        
         public void Run()
@@ -151,52 +155,9 @@ namespace Stargate
                 RemoteIP = remoteIP
             };
 
-            //handle HTTP request
-            ProxyRequest(request, response);
+            //proxy it
+            proxy.ProxyRequest(request, response);
         }
-
-        private void ProxyRequest(Request request, Response response)
-        {
-            HttpFetcher httpFetcher = new HttpFetcher();
-            var html = httpFetcher.GetAsString(request.Url);
-
-            HtmlConverter converter = new HtmlConverter()
-            {
-                AllowDuplicateLinks = true,
-                ShouldRenderHyperlinks = true
-            };
-            var content = converter.Convert(request.Url.AbsoluteUri, html);
-            response.Success();
-            response.Write(content.Gemtext);
-            WriteFooter(response, html.Length, content.Gemtext.Length);
-        }
-
-        private void WriteFooter(Response response, int htmlSize, int gmiSize)
-        {
-            response.WriteLine();
-            response.WriteLine();
-            response.WriteLine("------");
-            response.WriteLine("Teleported and converted via Stargate 💫🚪");
-            response.WriteLine($"Size: {ReadableFileSize(gmiSize)}. {Savings(gmiSize, htmlSize)} smaller than original: {ReadableFileSize(htmlSize)} 🤮");
-            response.WriteLine("=> mailto:acidus@gemi.dev Made with ❤️ by Acidus");
-        }
-
-        private string Savings(int newSize, int originalSize)
-            => string.Format("{0:0.00}%", (1.0d - (Convert.ToDouble(newSize) / Convert.ToDouble(originalSize))) * 100.0d);
-
-        private string ReadableFileSize(double size, int unit = 0)
-        {
-            string[] units = { "B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
-
-            while (size >= 1024)
-            {
-                size /= 1024;
-                ++unit;
-            }
-
-            return string.Format("{0:0.0#} {1}", size, units[unit]);
-        }
-
 
         /// <summary>
         /// Validates the raw gemini request. If not, writes the appropriate errors on the response object and returns null
@@ -235,7 +196,7 @@ namespace Stargate
                 return null;
             }
 
-            if(ret.Scheme != "http" && ret.Scheme != "https")
+            if(!proxy.SupportsProtocol(ret))
             {
                 //refuse to proxy to other protocols
                 response.ProxyRefused("protocols");

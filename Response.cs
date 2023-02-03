@@ -1,5 +1,7 @@
 ﻿using System.Net.Security;
 using System.Text;
+using static System.Net.Mime.MediaTypeNames;
+
 namespace Stargate
 {
     public class Response
@@ -19,26 +21,21 @@ namespace Stargate
             StatusCode = 0;
         }
 
-        public void Success(string mimeType = "text/gemini")
-            => WriteStatusLine(20, mimeType);
-
-        public void Redirect(string url)
-            => WriteStatusLine(30, url);
-
-        public void Missing(string msg)
-            => WriteStatusLine(51, msg);
-
         public void ProxyRefused(string msg)
             => WriteStatusLine(53, $"Will not proxy requests for other {msg}");
 
         public void BadRequest(string msg)
             => WriteStatusLine(59, msg);
 
-        private void WriteStatusLine(int statusCode, string msg)
+        public void Error(string msg)
+            => WriteStatusLine(40, msg);
+
+        public void WriteStatusLine(int statusCode, string msg="")
         {
             StatusCode = statusCode;
             Meta = msg;
-            Write($"{statusCode} {msg}\r\n");
+            //don't use writeline since I need a full \r\n
+            Write(Encoding.UTF8.GetBytes($"{statusCode} {msg}\r\n"));
         }
 
         public void Write(byte[] data)
@@ -48,12 +45,15 @@ namespace Stargate
         }
 
         public void Write(string text)
-            => Write(text, Encoding.UTF8);
+            => Write(Encoding.UTF8.GetBytes(text));
 
-        public void Write(string text, Encoding encoding)
-            => Write(encoding.GetBytes(text));
+        public void WriteLine(string text)
+            => Write(text + "\n");
 
-        public void WriteLine(string text = "")
-            => Write(text + "\n", Encoding.UTF8);
+        public void CopyFrom(Stream stream)
+        {
+            stream.CopyTo(fout);
+        }
+
     }
 }
