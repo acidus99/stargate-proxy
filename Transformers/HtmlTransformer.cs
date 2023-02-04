@@ -46,7 +46,8 @@ namespace Stargate.Transformers
             body.WriteLine();
             body.WriteLine("------");
             body.WriteLine("Teleported and converted via Stargate 💫🚪");
-            body.WriteLine($"Size: {ReadableFileSize(gmiSize)}. {Savings(gmiSize, htmlSize)} smaller than original: {ReadableFileSize(htmlSize)} 🤮");
+            var emoji = (htmlSize > gmiSize) ? "🤮" : "😳🤬";
+            body.WriteLine($"Size: {ReadableFileSize(gmiSize)}. {Savings(gmiSize, htmlSize)} smaller than original: {ReadableFileSize(htmlSize)} {emoji}");
             body.WriteLine("=> mailto:acidus@gemi.dev Made with ❤️ by Acidus");
         }
 

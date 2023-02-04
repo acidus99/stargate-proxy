@@ -2,3 +2,4 @@
 - Feature: Map HTTP response codes to Gemini (redirects, 404s, etc)
 - Feature: Convert RSS into Gemtext (like NewsWaffle)
 - Fixed: Default to octet-stream for HTTP responses without a content-type
+- Feature: Change footer emoji based on whether gemtext is smaller than HTML
