@@ -38,7 +38,10 @@ namespace Stargate
 
                 //write the response back to the client
                 response.WriteStatusLine(sourceResponse.StatusCode, sourceResponse.Meta);
-                response.CopyFrom(sourceResponse.Body);
+                if (sourceResponse.Body != null)
+                {
+                    response.CopyFrom(sourceResponse.Body);
+                }
             } catch(Exception e)
             {
                 response.Error(e.Message);

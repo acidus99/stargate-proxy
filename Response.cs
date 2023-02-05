@@ -11,7 +11,7 @@ namespace Stargate
         /// <summary>
         /// number of bytes sent to the client
         /// </summary>
-        public int Length { get; private set; }
+        public long Length { get; private set; }
 
         readonly SslStream fout;
 
@@ -52,6 +52,7 @@ namespace Stargate
 
         public void CopyFrom(Stream stream)
         {
+            Length += stream.Length;
             stream.CopyTo(fout);
         }
 

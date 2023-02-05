@@ -35,7 +35,7 @@ namespace Stargate.Requestors.Http
         public SourceResponse TranslateResponse(HttpResponseMessage http)
         {
             SourceResponse ret;
-            
+
             switch((int) http.StatusCode)
             {
                 case 200:
@@ -43,7 +43,8 @@ namespace Stargate.Requestors.Http
                     {
                         StatusCode = 20,
                         //TODO: handle charset, language
-                        Meta = http.Content.Headers.ContentType?.MediaType ?? "application/octet-stream"
+                        Meta = http.Content.Headers.ContentType?.MediaType ?? "application/octet-stream",
+                        Body = http.Content.ReadAsStream()
                     };
                     break;
 
@@ -70,6 +71,7 @@ namespace Stargate.Requestors.Http
                     ret = new SourceResponse
                     {
                         StatusCode = 51,
+                        Meta = "File not found"
                     };
                     break;
 
@@ -77,6 +79,7 @@ namespace Stargate.Requestors.Http
                     ret = new SourceResponse
                     {
                         StatusCode =  52,
+                        Meta = "Gone"
                     };
                     break;
 
@@ -84,11 +87,11 @@ namespace Stargate.Requestors.Http
                     //default to generic temp error
                     ret = new SourceResponse
                     {
-                        StatusCode = 40
+                        StatusCode = 40,
+                        Meta = "Generic error. HTTP response code: " + http.StatusCode
                     };
                     break;
             }
-            ret.Body = http.Content.ReadAsStream();
 
             return ret;
         }
