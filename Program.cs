@@ -18,7 +18,10 @@ namespace Stargate
             App app = new App("localhost",
                 1994,
                 CertificateUtils.LoadCertificate(cert, key)
-                );
+                )
+            {
+                IsMaskingRemoteIPs = false
+            };
 
             app.Run();
         }
