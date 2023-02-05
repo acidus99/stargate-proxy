@@ -10,9 +10,12 @@ using System.Security.Authentication;
 using System.IO;
 using System.Threading.Tasks;
 
-using Stargate.Requestors;
+
 using HtmlToGmi;
 
+using Stargate.Requestors;
+using Stargate.Logging;
+using AngleSharp.Io;
 
 namespace Stargate
 {
@@ -33,6 +36,7 @@ namespace Stargate
         private int port;
 
         private Proxy proxy;
+        private W3CLogger logger;
 
         public App(string hostname, int port, X509Certificate2 certificate)
         {
@@ -42,13 +46,14 @@ namespace Stargate
 
             serverCertificate = certificate;
             proxy = new Proxy();
+            logger = new W3CLogger(Console.Out);
         }
        
         public void Run()
         {
             if(serverCertificate == null)
             {
-                Console.WriteLine("Could not Load Server Key/Certificate. Exiting.");
+                Console.Error.WriteLine("Could not Load Server Key/Certificate. Exiting.");
                 return;
             }
 
@@ -73,19 +78,18 @@ namespace Stargate
 
         private void DisplayLaunchBanner()
         {
-            Console.WriteLine("3... 2... 1...");
+            Console.WriteLine("#3... 2... 1...");
             Console.WriteLine(
-@" ____  _                        _       
-/ ___|| |_ __ _ _ __ __ _  __ _| |_ ___ 
-\___ \| __/ _` | '__/ _` |/ _` | __/ _ \
- ___) | || (_| | | | (_| | (_| | ||  __/
-|____/ \__\__,_|_|  \__, |\__,_|\__\___|
-                    |___/               ");
+@"#  ____  _                        _       
+# / ___|| |_ __ _ _ __ __ _  __ _| |_ ___ 
+# \___ \| __/ _` | '__/ _` |/ _` | __/ _ \
+#  ___) | || (_| | | | (_| | (_| | ||  __/
+# |____/ \__\__,_|_|  \__, |\__,_|\__\___|
+#                     |___/               ");
 
-            Console.WriteLine("Gemini Gateway");
-            Console.WriteLine();
-            Console.WriteLine($"Hostname:\t{hostname}");
-            Console.WriteLine($"Port:\t\t{port}");
+            Console.WriteLine("#Gemini Gateway");
+            Console.WriteLine($"#Hostname: {hostname}");
+            Console.WriteLine($"#Port: {port}");
         }
 
         private void ProcessRequest(TcpClient client)
@@ -132,21 +136,27 @@ namespace Stargate
             string rawRequest = null;
             var response = new Response(sslStream);
 
+            var received = DateTime.Now;
+
             try
             {
                 // Read a message from the client.
                 rawRequest = ReadRequest(sslStream);
-            } catch(ApplicationException ex)
+            }
+            catch (ApplicationException ex)
             {
                 response.BadRequest(ex.Message);
+                LogInvalidRequest(received, remoteIP, response);
                 return;
             }
-
+            
             var url = ValidateRequest(rawRequest, response);
             if(url == null)
             {
-                //we already reported the appropriate status to the client, exit
-                return; 
+                //we already populated the response object and reported the
+                //appropriate status to the client, so we can exit
+                LogInvalidRequest(received, remoteIP, rawRequest, response);
+                return;
             }
 
             var request = new Request
@@ -157,11 +167,66 @@ namespace Stargate
 
             //proxy it
             proxy.ProxyRequest(request, response);
+            LogAccess(received, request, response);
+        }
+
+        public void LogAccess(DateTime received, Request request, Response response)
+        {
+            var completed = DateTime.Now;
+
+            var record = new AccessRecord
+            {
+                Date = AccessRecord.FormatDate(received),
+                Time = AccessRecord.FormatTime(received),
+                RemoteIP = request.RemoteIP,
+                Url = request.Url.AbsoluteUri,
+                StatusCode = response.StatusCode.ToString(),
+                Meta = response.Meta,
+                SentBytes = response.Length.ToString(),
+                TimeTaken = AccessRecord.ComputeTimeTaken(received, completed)
+            };
+            logger.LogAccess(record);
+        }
+
+        public void LogInvalidRequest(DateTime received, string remoteIP, Response response)
+        {
+            var completed = DateTime.Now;
+
+            var record = new AccessRecord
+            {
+                Date = AccessRecord.FormatDate(received),
+                Time = AccessRecord.FormatTime(received),
+                RemoteIP = remoteIP,
+                StatusCode = response.StatusCode.ToString(),
+                Meta = response.Meta,
+                SentBytes = response.Length.ToString(),
+                TimeTaken = AccessRecord.ComputeTimeTaken(received, completed)
+            };
+            logger.LogAccess(record);
+        }
+
+        public void LogInvalidRequest(DateTime received, string remoteIP, string rawRequest, Response response)
+        {
+            var completed = DateTime.Now;
+
+            var record = new AccessRecord
+            {
+                Date = AccessRecord.FormatDate(received),
+                Time = AccessRecord.FormatTime(received),
+                RemoteIP = remoteIP,
+                Url = AccessRecord.Sanitize(rawRequest, false),
+                StatusCode = response.StatusCode.ToString(),
+                Meta = response.Meta,
+                SentBytes = response.Length.ToString(),
+                TimeTaken = AccessRecord.ComputeTimeTaken(received, completed)
+            };
+            logger.LogAccess(record);
         }
 
         /// <summary>
-        /// Validates the raw gemini request. If not, writes the appropriate errors on the response object and returns null
-        /// if valid, returns GeminiUrl object
+        /// Validates the raw gemini request. If not, writes the appropriate
+        /// errors on the response object and returns null. if valid, returns
+        /// GeminiUrl object
         /// </summary>
         private Uri ValidateRequest(string rawRequest, Response response)
         {
