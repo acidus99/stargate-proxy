@@ -31,6 +31,16 @@ namespace Stargate.Transformers
             {
                 using (var fout = new StreamWriter(newBody))
                 {
+                    if (content.MetaData.HasTitle)
+                    {
+                        fout.WriteLine($"# {content.MetaData.Title}");
+                    }
+                    if (content.MetaData.FeedUrl != null)
+                    {
+                        fout.WriteLine($"=> {content.MetaData.FeedUrl} RSS/Atom feed detected");
+                    }
+                    fout.WriteLine();
+
                     fout.Write(content.Gemtext);
                     AppendFooter(fout, html.Length, content.Gemtext.Length);
                 }
