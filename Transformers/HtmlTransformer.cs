@@ -1,20 +1,22 @@
 ﻿using System;
 using System.IO;
 using System.IO.Compression;
+using AngleSharp.Io;
+using CodeHollow.FeedReader;
+
 using HtmlToGmi;
+using HtmlToGmi.Models;
 
 namespace Stargate.Transformers
 {
-    public class HtmlTransformer : ITransformer
+    public class HtmlTransformer : AbstractTextTransformer
     {
-        public bool CanTransform(string mimeType)
+        public override bool CanTransform(string mimeType)
             => mimeType.StartsWith("text/html");
 
-        public SourceResponse Transform(Request request, SourceResponse response)
+        public override SourceResponse Transform(Request request, SourceResponse response)
         {
-            var sr = new StreamReader(response.Body);
-            var html = sr.ReadToEnd();
-            sr.Close();
+            var html = ReadAllText(response);
 
             HtmlConverter converter = new HtmlConverter()
             {
@@ -23,10 +25,15 @@ namespace Stargate.Transformers
             };
             var content = converter.Convert(request.Url.AbsoluteUri, html);
 
-
             //reset my mime and body
             response.Meta = "text/gemini";
+            response.Body = RenderToStream(content, html.Length);
 
+            return response;
+        }
+
+        private MemoryStream RenderToStream(ConvertedContent content, int htmlLength)
+        {
             using (var newBody = new MemoryStream(content.Gemtext.Length + 200))
             {
                 using (var fout = new StreamWriter(newBody))
@@ -42,40 +49,10 @@ namespace Stargate.Transformers
                     fout.WriteLine();
 
                     fout.Write(content.Gemtext);
-                    AppendFooter(fout, html.Length, content.Gemtext.Length);
+                    AppendFooter(fout, htmlLength, content.Gemtext.Length);
                 }
-                response.Body = new MemoryStream(newBody.GetBuffer());
+                return new MemoryStream(newBody.GetBuffer());
             }
-
-            return response;
-        }
-
-        private void AppendFooter(TextWriter body, int htmlSize, int gmiSize)
-        {
-            body.WriteLine();
-            body.WriteLine();
-            body.WriteLine("------");
-            body.WriteLine("Teleported and converted via Stargate 💫🚪");
-            var emoji = (htmlSize > gmiSize) ? "🤮" : "😳🤬";
-            body.WriteLine($"Size: {ReadableFileSize(gmiSize)}. {Savings(gmiSize, htmlSize)} smaller than original: {ReadableFileSize(htmlSize)} {emoji}");
-            body.WriteLine("=> mailto:acidus@gemi.dev Made with ❤️ by Acidus");
-        }
-
-        private string Savings(int newSize, int originalSize)
-            => string.Format("{0:0.00}%", (1.0d - (Convert.ToDouble(newSize) / Convert.ToDouble(originalSize))) * 100.0d);
-
-        private string ReadableFileSize(double size, int unit = 0)
-        {
-            string[] units = { "B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
-
-            while (size >= 1024)
-            {
-                size /= 1024;
-                ++unit;
-            }
-
-            return string.Format("{0:0.0#} {1}", size, units[unit]);
         }
     }
 }
-
