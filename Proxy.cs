@@ -42,9 +42,11 @@ namespace Stargate
                 {
                     response.CopyFrom(sourceResponse.Body);
                 }
-            } catch(Exception e)
+            }
+            catch (Exception ex)
             {
-                response.Error(e.Message);
+                var msg = ex.InnerException?.Message ?? ex.Message;
+                response.Error(msg);
             }
         }
     }
