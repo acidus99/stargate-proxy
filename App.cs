@@ -67,7 +67,7 @@ namespace Stargate
                     Task.Run(() => ProcessRequest(client));
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
             }
             finally
@@ -102,11 +102,11 @@ namespace Stargate
                 var remoteIP = getClientIP(client);
                 ProcessRequest(remoteIP, sslStream);
             }
-            catch (AuthenticationException e)
+            catch (AuthenticationException)
             {
             }
             //Ensure that an exception processing a request doesn't take down the whole server
-            catch (Exception e)
+            catch (Exception)
             {
             }
             finally
