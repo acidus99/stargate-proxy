@@ -15,7 +15,7 @@ namespace Stargate.Requestors.Http
             {
                 AllowAutoRedirect = false,
                 CheckCertificateRevocationList = false,
-                AutomaticDecompression = System.Net.DecompressionMethods.None,
+                AutomaticDecompression = System.Net.DecompressionMethods.All,
             });
 
             Client.Timeout = TimeSpan.FromSeconds(20);
