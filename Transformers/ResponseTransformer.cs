@@ -6,7 +6,7 @@ namespace Stargate.Transformers
 		ITransformer[] transformers =
 		{
 			new HtmlTransformer(),
-			new RssTransformer(),
+			new FeedTransformer(),
 			new ImageTransformer()
 		};
 

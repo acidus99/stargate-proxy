@@ -11,10 +11,11 @@ using System.Diagnostics.Metrics;
 
 namespace Stargate.Transformers
 {
-    public class RssTransformer : AbstractTextTransformer
+    public class FeedTransformer : AbstractTextTransformer
     {
         public override bool CanTransform(string mimeType)
-            => mimeType.StartsWith("application/rss+xml");
+            => mimeType.StartsWith("application/rss+xml") ||
+                mimeType.StartsWith("application/atom+xml");
 
         public override SourceResponse Transform(Request request, SourceResponse response)
         {
@@ -44,7 +45,7 @@ namespace Stargate.Transformers
                 using (var fout = new StreamWriter(newBody))
                 {
                     fout.WriteLine($"# {metaData.SiteName}");
-                    fout.WriteLine("This RSS feed has been automatically converted.");
+                    fout.WriteLine("This RSS/Atom feed has been automatically converted.");
 
                     fout.WriteLine($"## {metaData.Title}");
                     if (metaData.FeaturedImage != null)

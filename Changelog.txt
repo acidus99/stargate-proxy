@@ -1,6 +1,6 @@
 ﻿- Feature: Support non-HTML responses
 - Feature: Map HTTP response codes to Gemini (redirects, 404s, etc)
-- Feature: Transform RSS into Gemtext (like NewsWaffle)
+- Feature: Transform RSS feeds into Gemtext (like NewsWaffle)
 - Fixed: Default to octet-stream for HTTP responses without a content-type
 - Feature: Change footer emoji based on whether gemtext is smaller than HTML
 - Feature: Transform advanced image formats (WebP, SVG, etc) into basic ones (PNG, JPG) for gemini clients
@@ -9,3 +9,4 @@
 - Feature: Brotli/gzip HTTP compression support for faster proxying
 - Fixed: Properly resolved HTTP redirects with relative URL
 - Fixed: Display most detailed error message from HTTP/HTTPS exceptions
+- Feature: Transform Atom feeds into Gemtext (like NewsWaffle)
