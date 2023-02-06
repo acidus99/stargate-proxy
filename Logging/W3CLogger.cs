@@ -7,7 +7,6 @@ namespace Stargate.Logging
         TextWriter Logger;
         bool HaveWrittenHeader;
 
-
         public W3CLogger(TextWriter logger)
         {
             Logger = logger;
@@ -31,8 +30,6 @@ namespace Stargate.Logging
             Logger.WriteLine($"#Date: {DateTime.Now.ToUniversalTime().ToString("dd-MMM-yyyy HH:mm:ss")}");
             Logger.WriteLine("#Fields: date time c-ip cs-uri sc-status x-meta sc-bytes sc-time-taken");
         }
-
-
     }
 }
 
