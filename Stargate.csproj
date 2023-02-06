@@ -14,6 +14,7 @@
     <None Remove="CodeHollow.FeedReader" />
     <None Remove="Magick.NET-Q8-AnyCPU" />
     <None Remove="Logging\" />
+    <None Remove="output\**" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Transformers\" />
