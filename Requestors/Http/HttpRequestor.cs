@@ -54,7 +54,7 @@ namespace Stargate.Requestors.Http
                     ret = new SourceResponse
                     {
                         StatusCode = 31,
-                        Meta = http.Headers.Location?.AbsoluteUri ?? ""
+                        Meta = ResolveRedirect(http.RequestMessage.RequestUri, http.Headers.Location)
                     };
                     break;
 
@@ -63,7 +63,7 @@ namespace Stargate.Requestors.Http
                     ret = new SourceResponse
                     {
                         StatusCode = 30,
-                        Meta = http.Headers.Location?.AbsoluteUri ?? ""
+                        Meta = ResolveRedirect(http.RequestMessage.RequestUri, http.Headers.Location)
                     };
                     break;
 
@@ -95,5 +95,15 @@ namespace Stargate.Requestors.Http
 
             return ret;
         }
+
+        private string ResolveRedirect(Uri requestUrl, Uri redirectUrl)
+        {
+            if(redirectUrl == null)
+            {
+                return "";
+            }
+            var resolvedUrl = new Uri(requestUrl, redirectUrl);
+            return resolvedUrl.AbsoluteUri;
+        } 
     }
 }

@@ -7,3 +7,4 @@
 - Feature: Add HTML title to top of converted gemtext
 - Feature: Detect RSS/Atom feeds and add to top of converted gemtext
 - Feature: Brotli/gzip HTTP compression support for faster proxying
+- Fixed: Properly resolved HTTP redirects with relative URL
