@@ -6,6 +6,11 @@ namespace Stargate.Transformers
 {
 	public class ImageTransformer : ITransformer
 	{
+        /// <summary>
+        /// if an image is larger than this in width or height, it will be resized, preserving aspect ratio
+        /// </summary>
+        public int MaxDimension { get; set; } = 800;
+
         public bool CanTransform(string mimeType)
             => mimeType.StartsWith("image/");
 
@@ -39,12 +44,18 @@ namespace Stargate.Transformers
                 }
 
                 //change the format if its not something that most clients will natively render
-                //if (!IsCommonFormat(image.Format))
-                //{
-                //    image.Format = MagickFormat.Jpeg;
-                //    //explicitly set quality
-                //    image.Quality = 75;
-                //}
+                if (!IsCommonFormat(image.Format))
+                {
+                    image.Format = MagickFormat.Jpeg;
+                    //explicitly set quality
+                    image.Quality = 75;
+                }
+
+                if (image.Width > MaxDimension)
+                {
+                    var geo = new MagickGeometry(MaxDimension, MaxDimension);
+                    image.Resize(geo);
+                }
 
                 //strip out any meta data
                 image.Strip();
