@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.IO.Compression;
+using System.Net;
 using AngleSharp.Io;
 using CodeHollow.FeedReader;
 
@@ -41,6 +42,10 @@ namespace Stargate.Transformers
                     if (content.MetaData.HasTitle)
                     {
                         fout.WriteLine($"# {content.MetaData.Title}");
+                    }
+                    if(content.MetaData.OpenGraphType =="article")
+                    {
+                        fout.WriteLine($"=> gemini://gemi.dev/cgi-bin/waffle.cgi/article?{WebUtility.UrlEncode(content.Url.AbsoluteUri)} Article detected. View on 🧇 NewsWaffle?");
                     }
                     if (content.MetaData.FeedUrl != null)
                     {
