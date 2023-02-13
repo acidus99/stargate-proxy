@@ -52,9 +52,16 @@ namespace Stargate
 
         public void CopyFrom(Stream stream)
         {
-            Length += stream.Length;
-            stream.CopyTo(fout);
-        }
+            byte[] buffer = new byte[32 * 1024];
 
+            int read = 0;
+
+            do
+            {
+                read = stream.Read(buffer);
+                fout.Write(buffer, 0, read);
+                Length += read;
+            } while (read > 0);
+        }
     }
 }
