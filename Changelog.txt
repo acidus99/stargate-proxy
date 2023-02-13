@@ -10,3 +10,4 @@
 - Fixed: Properly resolved HTTP redirects with relative URL
 - Fixed: Display most detailed error message from HTTP/HTTPS exceptions
 - Feature: Transform Atom feeds into Gemtext (like NewsWaffle)
+- Feature: Resize images on-the-fly
