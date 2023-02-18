@@ -13,3 +13,4 @@
 - Feature: Resize images on-the-fly
 - Fixed: Detect feeds with generic text/xml MIME type
 - Feature: Show link to feature image
+- Feature: Detect RSS Enclosures and expose podcast audio files

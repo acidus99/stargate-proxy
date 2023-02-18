@@ -76,6 +76,10 @@ namespace Stargate.Transformers
                     fout.WriteLine("This RSS/Atom feed has been automatically converted.");
 
                     fout.WriteLine($"## {feed.Title}");
+                    if (feed.Items.FirstOrDefault()?.Enclosure != null)
+                    {
+                        fout.WriteLine("🎵 Audio Feed Detected!");
+                    }
                     if (feed.FeaturedImage != null)
                     {
                         fout.WriteLine($"=> {feed.FeaturedImage.AbsoluteUri} Featured Image");
@@ -95,7 +99,20 @@ namespace Stargate.Transformers
                             fout.WriteLine("Published: " + item.TimeAgo);
                         }
                         fout.WriteLine($"> {item.Description}");
-                        fout.WriteLine($"=> {item.Url} Read Entry");
+                        if (item.Enclosure != null)
+                        {
+                            fout.Write($"=> {item.Enclosure.Url} 🎵 Audio File ({item.Enclosure.MediaType})");
+                            if(item.Enclosure.Length.HasValue)
+                            {
+                                fout.Write($" {ReadableFileSize(item.Enclosure.Length.Value)}");
+                            }
+                            fout.WriteLine();
+                        }
+                        else
+                        {
+                            fout.WriteLine($"=> {item.Url} Read Entry");
+                        }
+
                     }
                     fout.Flush();
                     AppendFooter(fout, feed.OriginalSize, (int) fout.BaseStream.Position);
@@ -138,6 +155,9 @@ namespace Stargate.Transformers
             public string TimeAgo { get; set; }
 
             public bool HasTimeAgo => !string.IsNullOrEmpty(TimeAgo);
+
+            public FeedItemEnclosure Enclosure { get; set; }
+
         }
 
         private FeedLink Convert(FeedItem item)
@@ -146,8 +166,14 @@ namespace Stargate.Transformers
                 Title = Normalize(item.Title),
                 Description = Normalize(item.Description),
                 Url = CreateUrl(item.Link),
-                TimeAgo = FormatTimeAgo(item.PublishingDate)
+                TimeAgo = FormatTimeAgo(item.PublishingDate),
+                Enclosure = GetEnclosure(item)
             };
+
+        private FeedItemEnclosure GetEnclosure(FeedItem item)
+            => (item.SpecificItem is Rss20FeedItem) ?
+                ((Rss20FeedItem)item.SpecificItem).Enclosure :
+                null;
 
         private string FormatTimeAgo(DateTime? feedDateTime)
         {
