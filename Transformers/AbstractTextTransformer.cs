@@ -26,6 +26,19 @@ namespace Stargate.Transformers
                 return sr.ReadToEnd();
         }
 
+        /// <summary>
+        /// Reads all the bytes from the source stream *AND CLOSES IT*
+        /// </summary>
+        /// <param name="response"></param>
+        /// <returns></returns>
+        protected byte[] ReadAllBytes(SourceResponse response)
+        {
+            using (var ms = new MemoryStream()) {
+                response.Body.CopyTo(ms);
+                return ms.GetBuffer();
+            }
+        }
+
         protected void AppendFooter(TextWriter body, int htmlSize, int gmiSize)
         {
             body.WriteLine();
