@@ -11,3 +11,5 @@
 - Fixed: Display most detailed error message from HTTP/HTTPS exceptions
 - Feature: Transform Atom feeds into Gemtext (like NewsWaffle)
 - Feature: Resize images on-the-fly
+- Fixed: Detect feeds with generic text/xml MIME type
+- Feature: Show link to feature image

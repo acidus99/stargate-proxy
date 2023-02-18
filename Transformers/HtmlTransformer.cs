@@ -43,13 +43,17 @@ namespace Stargate.Transformers
                     {
                         fout.WriteLine($"# {content.MetaData.Title}");
                     }
-                    if(content.MetaData.OpenGraphType =="article")
-                    {
-                        fout.WriteLine($"=> gemini://gemi.dev/cgi-bin/waffle.cgi/article?{WebUtility.UrlEncode(content.Url.AbsoluteUri)} Article detected. View on 🧇 NewsWaffle?");
-                    }
                     if (content.MetaData.FeedUrl != null)
                     {
                         fout.WriteLine($"=> {content.MetaData.FeedUrl} RSS/Atom feed detected");
+                    }
+                    if (content.MetaData.OpenGraphImage != null)
+                    {
+                        fout.WriteLine($"=> {content.MetaData.OpenGraphImage} Featured Imaged");
+                    }
+                    if (content.MetaData.OpenGraphType == "article")
+                    {
+                        fout.WriteLine($"=> gemini://gemi.dev/cgi-bin/waffle.cgi/article?{WebUtility.UrlEncode(content.Url.AbsoluteUri)} Article detected. View on 🧇 NewsWaffle?");
                     }
                     fout.WriteLine();
 
