@@ -15,11 +15,21 @@ namespace Stargate.Transformers
     {
         public override bool CanTransform(string mimeType)
             => mimeType.StartsWith("application/rss+xml") ||
-                mimeType.StartsWith("application/atom+xml");
+                mimeType.StartsWith("application/atom+xml") ||
+                //some people don't have Mimetypes setup properly, so if its XML, say we can handle it
+                //and then test the body. If its not really a RSS/Atom feed we will pass the original body on
+                mimeType.StartsWith("text/xml");
 
         public override SourceResponse Transform(Request request, SourceResponse response)
         {
             var xml = ReadAllText(response);
+
+            if(!IsReallyFeed(xml))
+            {
+                //reset body
+                response.Body = RenderToStream(xml);
+                return response;
+            }
 
             var feed = ParseFeed(xml);
 
@@ -28,6 +38,12 @@ namespace Stargate.Transformers
             response.Body = RenderToStream(feed);
 
             return response;
+        }
+
+        private bool IsReallyFeed(string xml)
+        {
+            var prefix = xml.Substring(0, Math.Min(xml.Length, 250));
+            return prefix.Contains("<rss") || prefix.Contains("<feed");
         }
 
         private FeedSummary ParseFeed(string xml)
@@ -83,6 +99,18 @@ namespace Stargate.Transformers
                     }
                     fout.Flush();
                     AppendFooter(fout, feed.OriginalSize, (int) fout.BaseStream.Position);
+                }
+                return new MemoryStream(newBody.GetBuffer());
+            }
+        }
+
+        private MemoryStream RenderToStream(string xml)
+        {
+            using (var newBody = new MemoryStream(xml.Length))
+            {
+                using (var fout = new StreamWriter(newBody))
+                {
+                    fout.Write(xml);
                 }
                 return new MemoryStream(newBody.GetBuffer());
             }
