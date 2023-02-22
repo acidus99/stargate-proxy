@@ -3,11 +3,7 @@ using System.Net;
 using System.IO;
 using System.Text.RegularExpressions;
 
-using CodeHollow.FeedReader;
-using CodeHollow.FeedReader.Feeds;
-using AngleSharp.Io;
-using System.Reflection.Metadata;
-using System.Diagnostics.Metrics;
+using HtmlToGmi.NewsFeeds;
 
 namespace Stargate.Transformers
 {
@@ -46,27 +42,13 @@ namespace Stargate.Transformers
             return prefix.Contains("<rss") || prefix.Contains("<feed");
         }
 
-        private FeedSummary ParseFeed(string xml)
+        private Feed ParseFeed(string xml)
         {
-            var feed = FeedReader.ReadFromString(xml);
-            FeedSummary ret = new FeedSummary
-            {
-                Description = Normalize(feed.Description),
-                FeaturedImage = CreateUrl(feed.ImageUrl),
-                OriginalSize = xml.Length,
-                Title = Normalize(feed.Title),
-                SiteName = Normalize(feed.Copyright)
-            };
-
-            ret.Items = feed.Items
-                .Select(x => Convert(x))
-                .Where(x => (x.Url != null))
-                .ToList();
-
-            return ret;
+            FeedConverter converter = new FeedConverter();
+            return converter.Convert(xml);
         }
 
-        private MemoryStream RenderToStream(FeedSummary feed)
+        private MemoryStream RenderToStream(Feed feed)
         {
             using (var newBody = new MemoryStream(feed.OriginalSize))
             {
@@ -94,9 +76,9 @@ namespace Stargate.Transformers
                     {
                         counter++;
                         fout.WriteLine($"## {item.Title}");
-                        if(item.HasTimeAgo)
+                        if(item.Published.HasValue)
                         {
-                            fout.WriteLine("Published: " + item.TimeAgo);
+                            fout.WriteLine("Published: " + item.GetTimeAgo(DateTime.Now));
                         }
                         fout.WriteLine($"> {item.Description}");
                         if (item.Enclosure != null)
@@ -133,88 +115,6 @@ namespace Stargate.Transformers
             }
         }
 
-        private class FeedSummary
-        {
-            public string Description;
-            public Uri FeaturedImage;
-            public int OriginalSize;
-            public string Title;
-            public string SiteName;
-
-            public List<FeedLink> Items;
-        }
-
-        private class FeedLink
-        {
-            public string Title { get; set; }
-
-            public string Description { get; set; }
-
-            public Uri Url { get; set; }
-
-            public string TimeAgo { get; set; }
-
-            public bool HasTimeAgo => !string.IsNullOrEmpty(TimeAgo);
-
-            public FeedItemEnclosure Enclosure { get; set; }
-
-        }
-
-        private FeedLink Convert(FeedItem item)
-            => new FeedLink
-            {
-                Title = Normalize(item.Title),
-                Description = Normalize(item.Description),
-                Url = CreateUrl(item.Link),
-                TimeAgo = FormatTimeAgo(item.PublishingDate),
-                Enclosure = GetEnclosure(item)
-            };
-
-        private FeedItemEnclosure GetEnclosure(FeedItem item)
-            => (item.SpecificItem is Rss20FeedItem) ?
-                ((Rss20FeedItem)item.SpecificItem).Enclosure :
-                null;
-
-        private string FormatTimeAgo(DateTime? feedDateTime)
-        {
-            if(!feedDateTime.HasValue)
-            {
-                return "";
-            }
-
-            var s = DateTime.Now.Subtract(feedDateTime.Value);
-            int dayDiff = (int)s.TotalDays;
-
-            int secDiff = (int)s.TotalSeconds;
-
-            if (dayDiff == 0)
-            {
-                if (secDiff < 60)
-                {
-                    return "just now";
-                }
-                if (secDiff < 120)
-                {
-                    return "1 minute ago";
-                }
-                if (secDiff < 3600)
-                {
-                    return $"{Math.Floor((double)secDiff / 60)} minutes ago";
-                }
-                if (secDiff < 7200)
-                {
-                    return "1 hour ago";
-                }
-                if (secDiff < 86400)
-                {
-                    return $"{Math.Floor((double)secDiff / 3600)} hours ago";
-                }
-            }
-            if (dayDiff == 1)
-            {
-                return "yesterday";
-            }
-            return string.Format("{0} days ago", dayDiff);
-        }
+        
     }
 }

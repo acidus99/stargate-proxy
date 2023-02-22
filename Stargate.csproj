@@ -21,7 +21,6 @@
     <Folder Include="Logging\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CodeHollow.FeedReader" Version="1.2.4" />
     <PackageReference Include="Magick.NET-Q8-AnyCPU" Version="12.2.2" />
   </ItemGroup>
 </Project>
