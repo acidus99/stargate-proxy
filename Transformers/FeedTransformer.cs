@@ -55,7 +55,7 @@ namespace Stargate.Transformers
                 using (var fout = new StreamWriter(newBody))
                 {
                     fout.WriteLine($"# {feed.SiteName}");
-                    fout.WriteLine("This RSS/Atom feed has been automatically converted.");
+                    fout.WriteLine("This RSS/Atom feed has been automatically converted by Stargate 💫🚪.");
 
                     fout.WriteLine($"## {feed.Title}");
                     if (feed.Items.FirstOrDefault()?.Enclosure != null)
