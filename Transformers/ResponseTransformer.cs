@@ -12,14 +12,25 @@ namespace Stargate.Transformers
 
 		public SourceResponse Transform(Request request, SourceResponse original)
 		{
-			foreach(var transformer in transformers)
+			try
 			{
-				if(transformer.CanTransform(original.Meta))
+				foreach (var transformer in transformers)
 				{
-					return transformer.Transform(request, original);
+					if (transformer.CanTransform(original.Meta))
+					{
+						return transformer.Transform(request, original);
+					}
 				}
+				return original;
 			}
-			return original;
+			catch (TransformationException ex)
+			{
+				return new SourceResponse
+				{
+					StatusCode = 20,
+					Meta = $"Error transforming content ({ex.Message})"
+				};
+			}
 		}		
 	}
 }
