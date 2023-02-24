@@ -42,8 +42,9 @@ namespace Stargate.Requestors.Http
                     ret = new SourceResponse
                     {
                         StatusCode = 20,
-                        //TODO: handle charset, language
-                        Meta = http.Content.Headers.ContentType?.MediaType ?? "application/octet-stream",
+                        Meta = http.Content.Headers.ContentType?.ToString() ?? "application/octet-stream",
+
+                        SourceContentType = http.Content.Headers.ContentType,
                         Body = http.Content.ReadAsStream()
                     };
                     break;
