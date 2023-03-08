@@ -8,17 +8,16 @@
 
   <ItemGroup>
     <ProjectReference Include="..\HtmlToGmi\HtmlToGmi.csproj" />
+    <ProjectReference Include="..\RocketForce\RocketForce\RocketForce.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Transformers\" />
     <None Remove="CodeHollow.FeedReader" />
     <None Remove="Magick.NET-Q8-AnyCPU" />
-    <None Remove="Logging\" />
     <None Remove="output\**" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Transformers\" />
-    <Folder Include="Logging\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Magick.NET-Q8-AnyCPU" Version="12.2.2" />

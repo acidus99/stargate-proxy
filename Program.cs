@@ -1,11 +1,12 @@
 ﻿
+using RocketForce;
+
 namespace Stargate
 {
     class Program
     {
         static void Main(string[] args)
         {
-
             if(args.Length != 4)
             {
                 Console.WriteLine("Pass cert and key via args");
@@ -17,7 +18,7 @@ namespace Stargate
             var cert = args[2];
             var key = args[3];
 
-            App app = new App(host,
+            var proxy = new GeminiProxyServer(host,
                 port,
                 CertificateUtils.LoadCertificate(cert, key)
                 )
@@ -25,7 +26,7 @@ namespace Stargate
                 IsMaskingRemoteIPs = false
             };
 
-            app.Run();
+            proxy.Run();
         }
 
     }

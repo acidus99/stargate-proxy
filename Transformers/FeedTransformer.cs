@@ -4,6 +4,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 
 using HtmlToGmi.NewsFeeds;
+using RocketForce;
 
 namespace Stargate.Transformers
 {

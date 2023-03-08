@@ -1,6 +1,7 @@
 ﻿using System;
 
 using ImageMagick;
+using RocketForce;
 
 namespace Stargate.Transformers
 {

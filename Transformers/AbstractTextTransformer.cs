@@ -2,6 +2,8 @@
 using System.Net;
 using System.Text.RegularExpressions;
 
+using RocketForce;
+
 namespace Stargate.Transformers
 {
     /// <summary>
