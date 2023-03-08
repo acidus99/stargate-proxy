@@ -51,7 +51,7 @@ namespace Stargate.Transformers
                     image.Quality = 75;
                 }
 
-                if (image.Width > MaxDimension)
+                if (image.Width > MaxDimension || image.Height > MaxDimension)
                 {
                     var geo = new MagickGeometry(MaxDimension, MaxDimension);
                     image.Resize(geo);
