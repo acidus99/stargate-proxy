@@ -1,4 +1,7 @@
 ﻿using System;
+
+using RocketForce;
+
 namespace Stargate.Transformers
 {
 	public interface ITransformer

@@ -6,6 +6,7 @@ using System.Text;
 using HtmlToGmi;
 using HtmlToGmi.Encodings;
 using HtmlToGmi.Models;
+using RocketForce;
 
 
 namespace Stargate.Transformers
