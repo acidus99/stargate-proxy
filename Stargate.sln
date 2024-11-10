@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HtmlToGmi", "..\HtmlToGmi\H
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RocketForce", "..\RocketForce\RocketForce\RocketForce.csproj", "{0BC9A735-0C29-4991-820D-8C4629AF4AB5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gemini.Net", "..\Gemini.Net\Gemini.Net.csproj", "{9660BE5F-1B34-47E7-9DB9-71CE042D1067}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gemini.Net", "..\Gemini.Net\src\Gemini.Net.csproj", "{9660BE5F-1B34-47E7-9DB9-71CE042D1067}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
