@@ -10,7 +10,7 @@ namespace Stargate.Transformers
         /// <summary>
         /// if an image is larger than this in width or height, it will be resized, preserving aspect ratio
         /// </summary>
-        public int MaxDimension { get; set; } = 800;
+        public uint MaxDimension { get; set; } = 800;
 
         public bool CanTransform(string mimeType)
             => mimeType.StartsWith("image/");
@@ -29,7 +29,7 @@ namespace Stargate.Transformers
             using (var image = new MagickImage(response.Body))
             {
 
-                //if its not raster, make it raster
+                //if it's not raster, make it raster
                 if (image.Format == MagickFormat.Svg)
                 {
                     image.Format = MagickFormat.Png;
@@ -44,7 +44,7 @@ namespace Stargate.Transformers
                     image.Alpha(AlphaOption.Remove);
                 }
 
-                //change the format if its not something that most clients will natively render
+                //change the format if it's not something that most clients will natively render
                 if (!IsCommonFormat(image.Format))
                 {
                     image.Format = MagickFormat.Jpeg;
@@ -61,12 +61,15 @@ namespace Stargate.Transformers
                 //strip out any meta data
                 image.Strip();
 
-                //TODO: change size here
+                // Retrieve the MagickFormatInfo for the image's format
+                var formatInfo = MagickFormatInfo.Create(image.Format);
+                // Get the MIME type as a string
+                string mimeType = formatInfo?.MimeType ?? "image.jpeg";
 
                 return new MediaContent
                 {
                     Data = image.ToByteArray(),
-                    MimeType = image.FormatInfo.MimeType
+                    MimeType = mimeType
                 };
             }
         }
