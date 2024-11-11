@@ -1,37 +1,37 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\HtmlToGmi\HtmlToGmi.csproj" />
-    <ProjectReference Include="..\RocketForce\RocketForce\RocketForce.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="Transformers\" />
-    <None Remove="CodeHollow.FeedReader" />
-    <None Remove="Magick.NET-Q8-AnyCPU" />
-    <None Remove="output\**" />
-    <None Remove="publish\**" />
-    <None Remove="release\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Transformers\" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Magick.NET-Q8-AnyCPU" Version="14.0.0" />
-    <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
-    <PackageReference Include="System.Text.Encoding" Version="4.3.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="publish\**" />
-    <Compile Remove="release\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Remove="publish\**" />
-    <EmbeddedResource Remove="release\**" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\HtmlToGmi\HtmlToGmi.csproj"/>
+        <ProjectReference Include="..\RocketForce\RocketForce\RocketForce.csproj"/>
+    </ItemGroup>
+    <ItemGroup>
+        <None Remove="Transformers\"/>
+        <None Remove="CodeHollow.FeedReader"/>
+        <None Remove="Magick.NET-Q8-AnyCPU"/>
+        <None Remove="output\**"/>
+        <None Remove="publish\**"/>
+        <None Remove="release\**"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Folder Include="Transformers\"/>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Magick.NET-Q8-AnyCPU" Version="14.0.0"/>
+        <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0"/>
+        <PackageReference Include="System.Text.Encoding" Version="4.3.0"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Compile Remove="publish\**"/>
+        <Compile Remove="release\**"/>
+    </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Remove="publish\**"/>
+        <EmbeddedResource Remove="release\**"/>
+    </ItemGroup>
 </Project>

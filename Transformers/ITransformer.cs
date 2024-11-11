@@ -1,14 +1,10 @@
-﻿using System;
+﻿using RocketForce;
 
-using RocketForce;
+namespace Stargate.Transformers;
 
-namespace Stargate.Transformers
+public interface ITransformer
 {
-	public interface ITransformer
-	{
-		bool CanTransform(string mimeType);
+    bool CanTransform(string mimeType);
 
-		SourceResponse Transform(Request request, SourceResponse response);
-	}
+    SourceResponse Transform(Request request, SourceResponse response);
 }
-

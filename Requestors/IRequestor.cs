@@ -1,11 +1,8 @@
-﻿using System;
-namespace Stargate.Requestors
+﻿namespace Stargate.Requestors;
+
+public interface IRequestor
 {
-	public interface IRequestor
-	{
-		SourceResponse Request(Uri url);
+    SourceResponse Request(Uri url);
 
-		bool SupportsProtocol(Uri url);
-	}
+    bool SupportsProtocol(Uri url);
 }
-
