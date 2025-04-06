@@ -87,7 +87,7 @@ public class HtmlTransformer : AbstractTextTransformer
                 if (content.MetaData.FeedUrl != null)
                     fout.WriteLine($"=> {content.MetaData.FeedUrl} RSS/Atom feed detected");
                 if (content.MetaData.OpenGraphImage != null)
-                    fout.WriteLine($"=> {content.MetaData.OpenGraphImage} Featured Imaged");
+                    fout.WriteLine($"=> {content.MetaData.OpenGraphImage} Featured Image");
                 if (content.MetaData.OpenGraphType == "article")
                     fout.WriteLine(
                         $"=> gemini://gemi.dev/cgi-bin/waffle.cgi/article?{WebUtility.UrlEncode(content.Url.AbsoluteUri)} Article detected. View on 🧇 NewsWaffle?");
