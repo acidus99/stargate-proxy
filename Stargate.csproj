@@ -28,8 +28,8 @@
         <Folder Include="Transformers\"/>
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Magick.NET-Q8-AnyCPU" Version="14.0.0"/>
-        <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0"/>
+        <PackageReference Include="Magick.NET-Q8-AnyCPU" Version="14.6.0" />
+        <PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.4" />
         <PackageReference Include="System.Text.Encoding" Version="4.3.0"/>
     </ItemGroup>
     <ItemGroup>
