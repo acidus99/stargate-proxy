@@ -97,7 +97,7 @@ public class HtmlTransformer : AbstractTextTransformer
                 AppendFooter(fout, htmlLength, content.Gemtext.Length);
             }
 
-            return new MemoryStream(newBody.GetBuffer());
+            return new MemoryStream(newBody.ToArray());
         }
     }
 }

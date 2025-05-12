@@ -38,7 +38,7 @@ public abstract class AbstractTextTransformer : ITransformer
         using (var ms = new MemoryStream())
         {
             response.Body.CopyTo(ms);
-            return ms.GetBuffer();
+            return ms.ToArray();
         }
     }
 

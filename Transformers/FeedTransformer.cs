@@ -84,7 +84,7 @@ public class FeedTransformer : AbstractTextTransformer
                 AppendFooter(fout, feed.OriginalSize, (int)fout.BaseStream.Position);
             }
 
-            return new MemoryStream(newBody.GetBuffer());
+            return new MemoryStream(newBody.ToArray());
         }
     }
 
@@ -97,7 +97,7 @@ public class FeedTransformer : AbstractTextTransformer
                 fout.Write(xml);
             }
 
-            return new MemoryStream(newBody.GetBuffer());
+            return new MemoryStream(newBody.ToArray());
         }
     }
 }
