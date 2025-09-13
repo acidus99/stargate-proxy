@@ -3,14 +3,14 @@ using RocketForce;
 
 namespace Stargate;
 
-internal class Program
+public static class Program
 {
+    const string DefaultCertFileName = "localhost-proxy.crt";
+    const string DefaultKeyFileName = "localhost-proxy.key";
+    const string LocalSubjectName = "$CN=localhost, O=Stargate Proxy Local Certificate, OU=gemi.dev";
+    
     private static void Main(string[] args)
     {
-        const string DefaultCertFileName = "localhost-proxy.crt";
-        const string DefaultKeyFileName = "localhost-proxy.key";
-        const string LocalSubjectName = "$CN=localhost, O=Stargate Proxy Local Certificate, OU=gemi.dev";
-
         string hostname;
         int port;
         X509Certificate2 certificate;
@@ -83,7 +83,7 @@ internal class Program
 
             if (!CertificateUtils.TryLoadCertificate(certFilePath, keyFilePath, out certificate))
             {
-                Console.WriteLine("Could not load certifcate. Files may be the wrong format, or private key does not match certificate.");
+                Console.WriteLine("Could not load certificate. Files may be the wrong format, or private key does not match certificate.");
                 PrintUsage();
                 return;
             }
@@ -106,8 +106,8 @@ internal class Program
         Console.WriteLine($"Proxy started on {hostname}:{port}");
         proxy.Run();
     }
-    
-    public static void PrintUsage()
+
+    private static void PrintUsage()
     {
         Console.WriteLine("Usage:");
         Console.WriteLine();
