@@ -1,100 +1,121 @@
 ﻿using System.Reflection;
-using System.Security.Cryptography.X509Certificates;
 using RocketForce;
+using Mono.Options;
 
 namespace Stargate;
 
 public static class Program
 {
+    const string DefaultHostname = "localhost";
+    const int DefaultPort = 1994;
     const string DefaultCertFileName = "localhost-proxy.crt";
     const string DefaultKeyFileName = "localhost-proxy.key";
-    const string LocalSubjectName = "$CN=localhost, O=Stargate Proxy Local Certificate, OU=gemi.dev";
-    
-    private static void Main(string[] args)
+    const string LocalSubjectName = "CN=localhost, O=Stargate Proxy Local Certificate, OU=gemi.dev";
+
+    private static int Main(string[] args)
     {
-        string hostname;
-        int port;
-        X509Certificate2 certificate;
-        
-        Console.WriteLine($"Stargate {Version()} 💫🚪 Gemini-to-HTTP proxy");
-        
-        if (args.Length == 0)
+        //Defaults
+        string hostname = DefaultHostname;
+        int port = DefaultPort;
+        string? certFilePath = null;
+        string? keyFilePath = null;
+        bool showHelp = false;
+        bool showVersion = false;
+
+        var options = new OptionSet
         {
-            hostname = "localhost";
-            port = 1994;
-            
-            var currentDirectory = Directory.GetCurrentDirectory();
-            string certFilePath = Path.Combine(currentDirectory, DefaultCertFileName);
-            string keyFilePath = Path.Combine(currentDirectory, DefaultKeyFileName);
-            
-            //see if we already have an existing cert
-            if (!CertificateUtils.TryLoadCertificate(certFilePath, keyFilePath, out certificate))
-            {
-                Console.WriteLine("No valid certificate found. Generating new certificate/private key.");
-                
-                //nope, generate them
-                if (!CertificateUtils.CreateLocalCertificates(certFilePath, keyFilePath, LocalSubjectName))
-                {
-                    Console.WriteLine("Failed to generated certificate. Perhaps a write permissions issue?");
-                    return;
-                }
+            // Short aliases chosen to avoid -h, which is reserved for help
+            { "p|port=", "TCP port to listen on (default: 1994)", (int v) => port = v },
+            { "h|host=", "Hostname to listen on (default: localhost)", v => hostname = v },
+            { "c|cert=", "Path to TLS certificate file (PEM/CRT). If provided, --key is required.", v => certFilePath = v },
+            { "k|key=", "Path to private key file (PEM). If provided, --cert is required.", v => keyFilePath = v },
+            { "v|version", "Show version and exit", v => showVersion = v != null },
+            { "help|?", "Show help and exit", v => showHelp = v != null },
+        };
 
-                if (!CertificateUtils.TryLoadCertificate(certFilePath, keyFilePath, out certificate))
-                {
-                    Console.WriteLine("Could not load generated certificate/key. Perhaps a write permissions issue?");
-                    return;
-                }
-            }
-            //good to go
-        } else if (args.Length == 4)
+        try
         {
-
-            hostname = args[0];
-            string portArg = args[1];
-            string certFilePath = args[2];
-            string keyFilePath = args[3];
-
-            if (!IsValidHostname(hostname))
-            {
-                Console.WriteLine("Invalid hostname format.");
-                PrintUsage();
-                return;
-            }
-
-            if (!IsValidPort(portArg, out port))
-            {
-                Console.WriteLine("Invalid port number. Must be an integer between 1 and 65535.");
-                PrintUsage();
-                return;
-            }
-
-            if (!File.Exists(certFilePath))
-            {
-                Console.WriteLine("Certificate file does not exist.");
-                PrintUsage();
-                return;
-            }
-
-            if (!File.Exists(keyFilePath))
-            {
-                Console.WriteLine("Key file does not exist.");
-                PrintUsage();
-                return;
-            }
-
-            if (!CertificateUtils.TryLoadCertificate(certFilePath, keyFilePath, out certificate))
-            {
-                Console.WriteLine("Could not load certificate. Files may be the wrong format, or private key does not match certificate.");
-                PrintUsage();
-                return;
-            }
-            //good to go
+            options.Parse(args);
         }
-        else
+        catch (OptionException e)
         {
-            Console.WriteLine("Invalid arguments");
-            PrintUsage();
-            return;
+            Console.Error.WriteLine($"Error: {e.Message}");
+            Console.Error.WriteLine("Try `stargate --help` for usage.");
+            return 1;
+        }
+
+        if (showHelp)
+        {
+            PrintBanner();
+            PrintUsage(options);
+            return 0;
+        }
+
+        if (showVersion)
+        {
+            PrintBanner();
+            return 0;
+        }
+
+        //validate options
+        // Validate host
+        if (!IsValidHostname(hostname))
+        {
+            Console.Error.WriteLine("Error: Invalid hostname format.");
+            Console.Error.WriteLine("Try `stargate --help` for usage.");
+            return 1;
+        }
+
+        // Validate port
+        if (port < 1 || port > 65535)
+        {
+            Console.Error.WriteLine("Error: Invalid port number. Must be an integer between 1 and 65535.");
+            return 1;
+        }
+
+        // Enforce cert/key dependency
+        if ((certFilePath is null) ^ (keyFilePath is null))
+        {
+            Console.Error.WriteLine("Error: --cert and --key must be provided together (or neither).");
+            return 1;
+        }
+        
+        //enforce cert and key files exist
+        if (certFilePath is not null && !File.Exists(certFilePath))
+        {
+            Console.Error.WriteLine("Error: The certificate file path does not exist.");
+            return 1;
+        }
+
+        if (keyFilePath is not null && !File.Exists(keyFilePath))
+        {
+            Console.Error.WriteLine("Error: The private key file path does not exist.");
+            return 1;
+        }
+        
+        //if certs/key not specified, generate them
+        if (certFilePath is null)
+        {
+            var currentDirectory = Directory.GetCurrentDirectory();
+            certFilePath = Path.Combine(currentDirectory, DefaultCertFileName);
+            keyFilePath = Path.Combine(currentDirectory, DefaultKeyFileName);
+            
+            Console.WriteLine("No certificate and private key specified. Generating new certificate/private key. Created files are:");
+            Console.Error.WriteLine($"Certificate file path: \"{certFilePath}\"");
+            Console.Error.WriteLine($"Private key file path: \"{keyFilePath}\"");
+            if (!CertificateUtils.CreateLocalCertificates(certFilePath, keyFilePath, LocalSubjectName))
+            {
+                Console.Error.WriteLine("Error: Failed to create certificate and/or private key files.");
+                return 1;
+            }
+        }
+
+        if (!CertificateUtils.TryLoadCertificate(certFilePath, keyFilePath, out var certificate))
+        {
+            Console.Error.WriteLine("Error: Could not read and parse certificate and/or private key files. Files may be the wrong format, or private key does not match certificate. Files used were:");
+            Console.Error.WriteLine($"Certificate file path: \"{certFilePath}\"");
+            Console.Error.WriteLine($"Private key file path: \"{keyFilePath}\"");
+            return 1;
         }
 
         var proxy = new GeminiProxyServer(hostname,
@@ -106,37 +127,32 @@ public static class Program
         };
         Console.WriteLine($"Proxy started on {hostname}:{port}");
         proxy.Run();
+        return 0;
     }
 
-    private static void PrintUsage()
+    private static void PrintBanner()
     {
-        Console.WriteLine("Usage:");
+        Console.WriteLine($"Stargate {GetProductVersion()} 💫🚪 Gemini-to-HTTP proxy");
+    }
+    
+    private static void PrintUsage(OptionSet options)
+    {
         Console.WriteLine();
-        Console.WriteLine("1. Auto-generate a self-signed certificate and start the proxy:");
-        Console.WriteLine("   ./stargate");
-        Console.WriteLine("   This will auto-generate a self-signed certificate and start the proxy running on localhost on port 1994.");
+        Console.WriteLine("Usage: stargate [options]");
         Console.WriteLine();
-
-        Console.WriteLine("2. Provide a hostname, port, certificate file, and private key file to start the proxy:");
-        Console.WriteLine("   ./stargate <hostname> <port> <certificate_file_path> <private_key_file_path>");
-        Console.WriteLine("   - <hostname>: The domain name or IP address the proxy should bind to.");
-        Console.WriteLine("   - <port>: The port on which the proxy should listen.");
-        Console.WriteLine("   - <certificate_file_path>: The path to the PEM certificate file.");
-        Console.WriteLine("   - <private_key_file_path>: The path to the PEM private key file.");
+        Console.WriteLine("If no --cert/--key are supplied, a temporary self-signed certificate and key are generated in the current directory.");
         Console.WriteLine();
+        options.WriteOptionDescriptions(Console.Out);
     }
 
-    static string Version()
+    static string GetProductVersion()
     {
         var asm = Assembly.GetExecutingAssembly();
-
         return asm.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
                ?? "Unknown";
     }
-    
+
     static bool IsValidHostname(string hostname)
-        =>Uri.CheckHostName(hostname) == UriHostNameType.Dns;
-    
-    static bool IsValidPort(string portArg, out int port)
-        => int.TryParse(portArg, out port) && port > 0 && port <= 65535;
+        => Uri.CheckHostName(hostname) == UriHostNameType.Dns;
+
 }
