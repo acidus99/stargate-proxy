@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography.X509Certificates;
+﻿using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 using RocketForce;
 
 namespace Stargate;
@@ -15,7 +16,7 @@ public static class Program
         int port;
         X509Certificate2 certificate;
         
-        Console.WriteLine("Stargate 💫🚪 Gemini-to-HTTP proxy");
+        Console.WriteLine($"Stargate {Version()} 💫🚪 Gemini-to-HTTP proxy");
         
         if (args.Length == 0)
         {
@@ -123,6 +124,14 @@ public static class Program
         Console.WriteLine("   - <certificate_file_path>: The path to the PEM certificate file.");
         Console.WriteLine("   - <private_key_file_path>: The path to the PEM private key file.");
         Console.WriteLine();
+    }
+
+    static string Version()
+    {
+        var asm = Assembly.GetExecutingAssembly();
+
+        return asm.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
+               ?? "Unknown";
     }
     
     static bool IsValidHostname(string hostname)

@@ -5,8 +5,22 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <AssemblyName>Stargate</AssemblyName>
+
+        <!-- Your base semantic version -->
+        <BaseVersion>1.1</BaseVersion>
+
+        <BuildNumber>$([System.DateTime]::UtcNow.Subtract($([System.DateTime]::Parse("2020-01-01"))).Days)</BuildNumber>
+
+        <!-- Versions -->
+        <Version>$(BaseVersion)</Version> <!-- Human-facing / NuGet style -->
+        <FileVersion>$(BaseVersion).$(BuildNumber)</FileVersion> <!-- OS File Version -->
+        <AssemblyVersion>1.1.0.0</AssemblyVersion> <!-- Keep stable for binding -->
+        <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     </PropertyGroup>
 
+    
+    
+    
     <Target Name="RenameExecutableToLowerCase" AfterTargets="Publish">
         <!-- Use the executable's generated name and convert it to lowercase -->
         <Exec Command="mv $(PublishDir)/$(AssemblyName) $(PublishDir)/$(AssemblyName.ToLower())" Condition="Exists('$(PublishDir)/$(AssemblyName)')" />
