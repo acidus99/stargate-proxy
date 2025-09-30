@@ -44,16 +44,16 @@ public static class Program
             return 1;
         }
 
-        if (showHelp)
-        {
-            PrintBanner();
-            PrintUsage(options);
-            return 0;
-        }
+        PrintBanner();
 
         if (showVersion)
         {
-            PrintBanner();
+            return 0;
+        }
+        
+        if (showHelp)
+        {
+            PrintUsage(options);
             return 0;
         }
 
