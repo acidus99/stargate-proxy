@@ -26,10 +26,10 @@ You can play with a public instance of Stargate by configuring your Gemini clien
 Prebuilt binaries are available for:  
 
 - macOS (Apple Silicon + Intel)  
-- Linux  
-- Windows  
+- Linux (x64) 
+- Windows (x64) 
 
-Check the [Releases](./releases) page to grab the right one for your system.  
+Check the [Releases](https://github.com/acidus99/stargate-proxy/releases) page to grab the right one for your system.  
 
 ## Usage
 
