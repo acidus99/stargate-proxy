@@ -5,6 +5,8 @@ namespace Stargate.Transformers;
 
 public class FeedTransformer : AbstractTextTransformer
 {
+    private const int MaxDescriptionLength = 300;
+    
     public override bool CanTransform(string mimeType)
     {
         return mimeType.StartsWith("application/rss+xml") ||
@@ -66,7 +68,7 @@ public class FeedTransformer : AbstractTextTransformer
                     counter++;
                     fout.WriteLine($"## {item.Title}");
                     if (item.Published.HasValue) fout.WriteLine("Published: " + item.GetTimeAgo(DateTime.Now));
-                    fout.WriteLine($"> {item.Description}");
+                    fout.WriteLine($"> {SmartTruncate(item.Description, MaxDescriptionLength)}");
                     if (item.Enclosure != null)
                     {
                         fout.Write($"=> {item.Enclosure.Url} 🎵 Audio File ({item.Enclosure.MediaType})");
@@ -99,5 +101,32 @@ public class FeedTransformer : AbstractTextTransformer
 
             return new MemoryStream(newBody.ToArray());
         }
+    }
+    
+    /// <summary>
+    /// Truncates a string on whitespace
+    /// </summary>
+    /// <param name="text"></param>
+    /// <param name="maxLength"></param>
+    /// <returns></returns>
+    private string SmartTruncate(string text, int maxLength)
+    {
+        if (string.IsNullOrEmpty(text) || text.Length <= maxLength)
+            return text;
+
+        // Work backwards from maxLength to find whitespace
+        int breakPoint = maxLength;
+        while (breakPoint > 0 && !char.IsWhiteSpace(text[breakPoint]))
+        {
+            breakPoint--;
+        }
+
+        // If no whitespace was found, just hard cut at maxLength
+        if (breakPoint == 0)
+            breakPoint = maxLength;
+
+        string truncated = text[..breakPoint].TrimEnd();
+
+        return truncated + "…"; 
     }
 }
