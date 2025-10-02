@@ -62,10 +62,8 @@ public class FeedTransformer : AbstractTextTransformer
                 if (feed.FeaturedImage != null) fout.WriteLine($"=> {feed.FeaturedImage.AbsoluteUri} Featured Image");
                 if (feed.Description.Length > 0) fout.WriteLine($">{feed.Description}");
                 fout.WriteLine();
-                var counter = 0;
                 foreach (var item in feed.Items)
                 {
-                    counter++;
                     fout.WriteLine($"## {item.Title}");
                     if (item.Published.HasValue) fout.WriteLine("Published: " + item.GetTimeAgo(DateTime.Now));
                     fout.WriteLine($"> {SmartTruncate(item.Description, MaxDescriptionLength)}");
