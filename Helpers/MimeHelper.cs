@@ -2,6 +2,9 @@ using System.Net.Http.Headers;
 
 namespace Stargate.Helpers;
 
+/// <summary>
+/// Centralized place for parsing/normalizing Mime types and charsets
+/// </summary>
 public static class MimeHelper
 {
     public static string? NormalizeCharset(MediaTypeHeaderValue? contentType)
