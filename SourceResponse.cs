@@ -15,7 +15,7 @@ public class SourceResponse
 	public string Meta { get; set; } = "";
 
 	/// <summary>
-	///     The content type of the s
+	///     The original parsed Content-Type header (if present) 
 	/// </summary>
 	public MediaTypeHeaderValue SourceContentType { get; set; }
 
