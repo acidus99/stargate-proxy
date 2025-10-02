@@ -69,12 +69,45 @@ Static HTML, blogs, and articles work best. Dynamic, JavaScript-heavy sites or w
 **Q: How do I report bugs or request features?**  
 Open an issue on the GitHub repo. Feedback is always welcome, but may not be taken.
 
-## Dependencies
+## Compiling from Source
 
-If building from source, you will need to download the following projects which the Stargate solution file depends upon:
+### Prerequisites
+- **.NET SDK 8.0+** (`dotnet --info` should work)
 
-- [Gemini.Net](https://github.com/acidus99/Gemini.Net) 
-- [HtmlToGmi](https://github.com/acidus99/HtmlToGmi)
-- [Rocketforce](https://github.com/acidus99/RocketForce)
+### 1) Clone Repository and Dependencies
 
-These are expected to be sibling directories to the Stargate project.
+Stargate uses sibling project references to its dependencies. Keep all four repos as siblings to each other in the same parent folder, as shown below:
+
+```bash
+# choose any parent folder
+mkdir stargate-src && cd stargate-src
+
+# clone all four repos as siblings
+git clone https://github.com/acidus99/stargate-proxy.git
+git clone https://github.com/acidus99/Gemini.Net.git
+git clone https://github.com/acidus99/HtmlToGmi.git
+git clone https://github.com/acidus99/RocketForce.git
+```
+
+Resulting layout:
+
+```
+stargate-src/
+├─ stargate-proxy/
+├─ Gemini.Net/
+├─ HtmlToGmi/
+└─ RocketForce/
+```
+
+### 2) Build & publish Stargate
+
+```bash
+dotnet publish stargate-proxy/Stargate.csproj -c Release -o ./publish
+```
+
+You now have a framework dependent executable in the `publish/` directory.
+
+```bash
+cd publish
+./stargate
+```
