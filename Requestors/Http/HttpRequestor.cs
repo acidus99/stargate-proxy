@@ -1,4 +1,6 @@
 ﻿using System.Net;
+using System.Text;
+using Stargate.Helpers;
 
 namespace Stargate.Requestors.Http;
 
@@ -38,14 +40,7 @@ public class HttpRequestor : IRequestor
         switch ((int)http.StatusCode)
         {
             case 200:
-                ret = new SourceResponse
-                {
-                    StatusCode = 20,
-                    Meta = http.Content.Headers.ContentType?.ToString() ?? "application/octet-stream",
-
-                    SourceContentType = http.Content.Headers.ContentType,
-                    Body = http.Content.ReadAsStream()
-                };
+                ret = Process200(http);
                 break;
 
             //prem redirect
@@ -92,10 +87,42 @@ public class HttpRequestor : IRequestor
                 };
                 break;
         }
-
+        
         return ret;
     }
 
+    //Parses a 200 response and validates of a charset (if present) can be parsed
+    //this allows us to return a 40 now if the charset is bad
+    private SourceResponse Process200(HttpResponseMessage http)
+    {
+        var ret = new SourceResponse
+        {
+            StatusCode = 20,
+            Meta = http.Content.Headers.ContentType?.ToString() ?? "application/octet-stream",
+
+            SourceContentType = http.Content.Headers.ContentType,
+            Body = http.Content.ReadAsStream()
+        };
+        
+        string? normalizeCharset = MimeHelper.NormalizeCharset(http.Content.Headers.ContentType);
+        
+        //sanity check the charset and return an error if we can't support it
+        if (normalizeCharset != null)
+        {
+            try
+            {
+                Encoding.GetEncoding(normalizeCharset);
+            }
+            catch (ArgumentException)
+            {
+                ret.StatusCode = 40;
+                ret.Meta = $"Error: Remote Content-Type uses an invalid/unsupported charset `{normalizeCharset}`";
+            }
+        }
+
+        return ret;
+    }
+    
     private string ResolveRedirect(Uri requestUrl, Uri redirectUrl)
     {
         if (redirectUrl == null) return "";

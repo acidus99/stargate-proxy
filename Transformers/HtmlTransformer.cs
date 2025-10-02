@@ -5,6 +5,7 @@ using HtmlToGmi;
 using HtmlToGmi.Encodings;
 using HtmlToGmi.Models;
 using RocketForce;
+using Stargate.Helpers;
 
 namespace Stargate.Transformers;
 
@@ -25,7 +26,6 @@ public class HtmlTransformer : AbstractTextTransformer
     {
         var responseBytes = ReadAllBytes(response);
 
-
         var converter = new HtmlConverter
         {
             AllowDuplicateLinks = true,
@@ -34,17 +34,18 @@ public class HtmlTransformer : AbstractTextTransformer
 
         ConvertedContent content = null;
 
-        //Do we have a charset in the Content-Type header? If so, that overrides all other charsets
-        if (HasCharset(response.SourceContentType))
+        string? normalizedCharset = MimeHelper.NormalizeCharset(response.SourceContentType);
+        
+        if(normalizedCharset != null)
         {
             var html = "";
             try
             {
-                html = Encoding.GetEncoding(response.SourceContentType.CharSet).GetString(responseBytes);
+                html = Encoding.GetEncoding(normalizedCharset).GetString(responseBytes);
             }
             catch (ArgumentException)
             {
-                throw new TransformationException($"unknown charset '{response.SourceContentType.CharSet}'");
+                throw new TransformationException($"Unknown/Unsupport charset '{response.SourceContentType.CharSet}' in source HTTP Content-Type.");
             }
 
             content = converter.Convert(request.Url, html);
@@ -70,11 +71,6 @@ public class HtmlTransformer : AbstractTextTransformer
         response.Body = RenderToStream(content, responseBytes.Length);
 
         return response;
-    }
-
-    private bool HasCharset(MediaTypeHeaderValue contentType)
-    {
-        return !string.IsNullOrEmpty(contentType.CharSet);
     }
 
     private MemoryStream RenderToStream(ConvertedContent content, int htmlLength)
