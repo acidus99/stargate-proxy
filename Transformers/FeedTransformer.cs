@@ -65,7 +65,10 @@ public class FeedTransformer : AbstractTextTransformer
                 foreach (var item in feed.Items)
                 {
                     fout.WriteLine($"## {item.Title}");
-                    if (item.Published.HasValue) fout.WriteLine("Published: " + item.GetTimeAgo(DateTime.Now));
+                    if (item.Published.HasValue)
+                    {
+                        fout.WriteLine($"Published: {item.GetTimeAgo(DateTime.Now)} on {item.Published.Value:MMMM d, yyyy}");
+                    }
                     fout.WriteLine($"> {SmartTruncate(item.Description, MaxDescriptionLength)}");
                     if (item.Enclosure != null)
                     {
